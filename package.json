@@ -1,0 +1,46 @@
+{
+  "name": "@janiscommerce/lambda-model-wrapper",
+  "version": "1.0.0",
+  "description": "A package to simplify wrapper model lambda functions in Janis Services",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "export TEST_ENV=true; mocha --exit -R nyan --recursive tests/ --require tests/bootstrap",
+    "coverage-ci": "nyc --reporter=lcov --reporter=text-summary mocha --exit --recursive tests/ --require tests/bootstrap",
+    "watch-test": "export TEST_ENV=true; mocha --exit -R nyan -w --recursive tests/ --require tests/bootstrap",
+    "coverage": "nyc npm test",
+    "lint": "eslint lib/ tests/",
+    "build-types": "tsc lib/index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/janis-commerce/lambda-model-wrapper.git"
+  },
+  "author": "Janis",
+  "license": "ISC",
+  "homepage": "https://github.com/janis-commerce/lambda-model-wrapper.git#readme",
+  "devDependencies": {
+    "@types/node": "^15.14.9",
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-plugin-import": "^2.25.3",
+    "husky": "^7.0.4",
+    "mocha": "^9.2.0",
+    "nyc": "^15.1.0",
+    "sinon": "^13.0.2",
+    "typescript": "^4.5.2"
+  },
+  "files": [
+    "lib/",
+    "types/"
+  ],
+  "types": "types/index.d.ts",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "@janiscommerce/lambda": "^3.7.1",
+    "@janiscommerce/superstruct": "^1.2.0",
+    "objects-normalizer": "^1.0.4"
+  }
+}
