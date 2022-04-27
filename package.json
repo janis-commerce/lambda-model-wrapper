@@ -4,9 +4,9 @@
   "description": "A package to simplify wrapper model lambda functions in Janis Services",
   "main": "lib/index.js",
   "scripts": {
-    "test": "export TEST_ENV=true; mocha --exit -R nyan --recursive tests/ --require tests/bootstrap",
-    "coverage-ci": "nyc --reporter=lcov --reporter=text-summary mocha --exit --recursive tests/ --require tests/bootstrap",
-    "watch-test": "export TEST_ENV=true; mocha --exit -R nyan -w --recursive tests/ --require tests/bootstrap",
+    "test": "export TEST_ENV=true; mocha --exit -R nyan --recursive tests/",
+    "coverage-ci": "nyc --reporter=lcov --reporter=text-summary mocha --exit --recursive tests/",
+    "watch-test": "export TEST_ENV=true; mocha --exit -R nyan -w --recursive tests/",
     "coverage": "nyc npm test",
     "lint": "eslint lib/ tests/",
     "build-types": "tsc lib/index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
@@ -20,6 +20,8 @@
   "license": "ISC",
   "homepage": "https://github.com/janis-commerce/lambda-model-wrapper.git#readme",
   "devDependencies": {
+    "@janiscommerce/api-session": "^3.3.1",
+    "@janiscommerce/model": "^6.2.0",
     "@types/node": "^15.14.9",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-base": "^13.2.0",
