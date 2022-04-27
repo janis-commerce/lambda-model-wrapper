@@ -24,8 +24,6 @@ jobs:
         run: npm run test
       - name: Lint code
         run: npm run lint
-      - name: Build types
-        run: npm run build-types
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
