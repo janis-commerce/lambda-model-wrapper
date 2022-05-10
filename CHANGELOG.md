@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.1.0] - 2022-05-10
 ### Added
 - `changeKeys` param support for `LambdaGet` wrapper
 - `format()` optional method for `LambdaGet` wrapper
