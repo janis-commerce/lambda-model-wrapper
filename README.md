@@ -20,6 +20,7 @@ LambdaGet is used to wrap the `get()` method from models.
 #### Configuration
 
 * The _getter_ `modelClass` should return the **Model** for our entity.
+* The _method_ **async** `format(items)` (optional): Receives the getted items as parameter so you can format them and return the formatted items.
 * You can use `mustHaveClient` to defines if the function will be used for Client models. _default_ `true`.
 * You can use `mustHavePayload` to make **payload** mandatory or not. _default_ `false`.
 
@@ -52,6 +53,14 @@ class GetProduct extends LambdaGet {
 
 	get modelClass() {
 		return ProductModel;
+	}
+
+	async format(items) {
+
+		return items.map(item => {
+			// do some formatting
+			return item;
+		});
 	}
 }
 
