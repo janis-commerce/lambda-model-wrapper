@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.2.0] - 2022-06-24
+### Added
+- `filters` can be used as an `array` for `LambdaGet` wrapper
+
 ## [1.1.0] - 2022-05-10
 ### Added
 - `changeKeys` param support for `LambdaGet` wrapper

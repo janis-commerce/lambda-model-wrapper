@@ -138,6 +138,43 @@ describe('LambdaGet', () => {
 		});
 	});
 
+	it('Should get skus and response the items and totals using filters as an array', async () => {
+
+		stubGet({
+			'coke-1lt': {
+				id: '62685f1900b3e56803b9cf8c',
+				referenceId: 'coke-1lt',
+				name: 'Coke 1lt',
+				status: 'active'
+			}
+		}, {
+			total: 1
+		});
+
+		const response = await Handler.handle(ValidGetWrapper, {
+			...event,
+			body: {
+				filters: [{ referenceId: 'coke-1lt', status: ['active', 'inactive'] }, { referenceId: 'coke-2lt', status: ['active', 'inactive'] }]
+			}
+		});
+
+		assert.deepEqual(response, {
+			items: {
+				'coke-1lt': {
+					id: '62685f1900b3e56803b9cf8c',
+					referenceId: 'coke-1lt',
+					name: 'Coke 1lt',
+					status: 'active'
+				}
+			},
+			totals: { total: 1 }
+		});
+
+		sinon.assert.calledOnceWithExactly(Model.prototype.get, {
+			filters: [{ referenceId: 'coke-1lt', status: ['active', 'inactive'] }, { referenceId: 'coke-2lt', status: ['active', 'inactive'] }]
+		});
+	});
+
 	it('Should apply fields normalization when using changeKeys param', async () => {
 
 		stubGet({
