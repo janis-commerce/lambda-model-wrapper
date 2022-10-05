@@ -18,8 +18,12 @@ describe('LambdaGet', () => {
 		sinon.stub(Model.prototype, 'get')
 			.resolves(items);
 
-		sinon.stub(Model.prototype, 'getTotals')
-			.resolves(totals);
+		if(totals) {
+			sinon.stub(Model.prototype, 'getTotals')
+				.resolves(totals);
+		} else
+			sinon.spy(Model.prototype, 'getTotals');
+
 	};
 
 	afterEach(() => {
@@ -35,7 +39,7 @@ describe('LambdaGet', () => {
 		}
 	}
 
-	class FormatWrapper extends ValidGetWrapper {
+	class GetWrapperWithFormat extends ValidGetWrapper {
 
 		async format(items) {
 			return items.map((item, index) => ({ ...item, extraField: index + 1 }));
@@ -48,11 +52,14 @@ describe('LambdaGet', () => {
 		});
 	});
 
-	it('Should use model to get items and response', async () => {
+	it('Should use model to get items, totals and response', async () => {
 
 		stubGet([], { total: 0 });
 
-		const response = await Handler.handle(ValidGetWrapper, event);
+		const response = await Handler.handle(ValidGetWrapper, {
+			...event,
+			body: { calculateTotals: true }
+		});
 
 		assert.deepEqual(response, {
 			items: [],
@@ -78,7 +85,10 @@ describe('LambdaGet', () => {
 
 		const response = await Handler.handle(ValidGetWrapper, {
 			...event,
-			body: { fields: ['id', 'referenceId'] }
+			body: {
+				fields: ['id', 'referenceId'],
+				calculateTotals: true
+			}
 		});
 
 		assert.deepEqual(response, {
@@ -114,7 +124,8 @@ describe('LambdaGet', () => {
 				page: 1,
 				limit: 1,
 				order: { name: 'asc' },
-				changeKeys: 'referenceId'
+				changeKeys: 'referenceId',
+				calculateTotals: true
 			}
 		});
 
@@ -154,7 +165,8 @@ describe('LambdaGet', () => {
 		const response = await Handler.handle(ValidGetWrapper, {
 			...event,
 			body: {
-				filters: [{ referenceId: 'coke-1lt', status: ['active', 'inactive'] }, { referenceId: 'coke-2lt', status: ['active', 'inactive'] }]
+				filters: [{ referenceId: 'coke-1lt', status: ['active', 'inactive'] }, { referenceId: 'coke-2lt', status: ['active', 'inactive'] }],
+				calculateTotals: true
 			}
 		});
 
@@ -183,8 +195,6 @@ describe('LambdaGet', () => {
 				referenceId: 'coke-1lt',
 				name: 'Coke 1lt'
 			}
-		}, {
-			total: 1
 		});
 
 		const response = await Handler.handle(ValidGetWrapper, {
@@ -202,8 +212,7 @@ describe('LambdaGet', () => {
 		assert.deepEqual(response, {
 			items: {
 				'coke-1lt': { name: 'Coke 1lt' }
-			},
-			totals: { total: 1 }
+			}
 		});
 
 		sinon.assert.calledOnceWithExactly(Model.prototype.get, {
@@ -213,6 +222,8 @@ describe('LambdaGet', () => {
 			order: { name: 'asc' },
 			changeKeys: 'referenceId'
 		});
+
+		sinon.assert.notCalled(Model.prototype.getTotals);
 	});
 
 	it('Should format items when format method is available', async () => {
@@ -225,11 +236,9 @@ describe('LambdaGet', () => {
 			id: '62685f4d659ebb59d22893d7',
 			referenceId: 'coke-2lt',
 			name: 'Coke 2lt'
-		}], {
-			total: 2
-		});
+		}]);
 
-		const response = await Handler.handle(FormatWrapper, { ...event });
+		const response = await Handler.handle(GetWrapperWithFormat, { ...event });
 
 		assert.deepEqual(response, {
 			items: [{
@@ -242,11 +251,55 @@ describe('LambdaGet', () => {
 				referenceId: 'coke-2lt',
 				name: 'Coke 2lt',
 				extraField: 2
-			}],
-			totals: { total: 2 }
+			}]
 		});
 
 		sinon.assert.calledOnceWithExactly(Model.prototype.get, {});
+		sinon.assert.notCalled(Model.prototype.getTotals);
+	});
+
+	it('Should use getPaged method when received allItems parameter', async () => {
+
+		sinon.stub(Model.prototype, 'get')
+			.onCall(0)
+			.resolves([{
+				id: '62685f1900b3e56803b9cf8c',
+				referenceId: 'coke-1lt',
+				name: 'Coke 1lt'
+			}])
+			.onCall(1)
+			.resolves([{
+				id: '62685f4d659ebb59d22893d7',
+				referenceId: 'coke-2lt',
+				name: 'Coke 2lt'
+			}]);
+
+		const response = await Handler.handle(GetWrapperWithFormat, {
+			...event,
+			body: {
+				limit: 1,
+				allItems: true
+			}
+		});
+
+		assert.deepEqual(response, {
+			items: [{
+				id: '62685f1900b3e56803b9cf8c',
+				referenceId: 'coke-1lt',
+				name: 'Coke 1lt',
+				extraField: 1
+			}, {
+				id: '62685f4d659ebb59d22893d7',
+				referenceId: 'coke-2lt',
+				name: 'Coke 2lt',
+				extraField: 2
+			}]
+		});
+
+		sinon.assert.calledWithExactly(Model.prototype.get, { page: 1, limit: 1 });
+		sinon.assert.calledWithExactly(Model.prototype.get, { page: 2, limit: 1 });
+		sinon.assert.calledWithExactly(Model.prototype.get, { page: 3, limit: 1 });
+		sinon.assert.calledThrice(Model.prototype.get);
 	});
 
 });

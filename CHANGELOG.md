@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.0.0] - 2022-06-24
+### Added
+- `getPaged()` method using parameter `allItems`
+
+### Changed
+- **_Breaking change_**: Now `calculateTotals` is required to perform `getTotals()` query and return `totals`
+
 ## [1.2.0] - 2022-06-24
 ### Added
 - `filters` can be used as an `array` for `LambdaGet` wrapper
