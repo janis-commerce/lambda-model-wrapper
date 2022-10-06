@@ -1,6 +1,6 @@
 {
   "name": "@janiscommerce/lambda-model-wrapper",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "A package to simplify wrapper model lambda functions in Janis Services",
   "main": "lib/index.js",
   "scripts": {
