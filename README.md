@@ -15,23 +15,35 @@ npm install @janiscommerce/lambda-model-wrapper
 
 ### LambdaGet
 
-LambdaGet is used to wrap the `get()` method from models.
+LambdaGet is used to wrap the `get()` and `getPaged()` method from models.
+
+#### Breaking changes _Since 2.0.0_ ⚠️
+
+* In `1.x.x` the `totals` were always calculated. Now you need to need to send the `calculateTotals` parameter with **true** value.
 
 #### Configuration
 
 * The _getter_ `modelClass` should return the **Model** for our entity.
-* The _method_ **async** `format(items)` (optional): Receives the getted items as parameter so you can format them and return the formatted items.
+* The _method_ **async** `format(items)` _optional_: Receives the getted items as parameter so you can format them and return the formatted items.
 * You can use `mustHaveClient` to defines if the function will be used for Client models. _default_ `true`.
 * You can use `mustHavePayload` to make **payload** mandatory or not. _default_ `false`.
 
-> :info: The **payload** is used to apply params to the `get()` method, this will be explained below.
+> ℹ️ The **payload** is used to apply params to the `get()` method, this will be explained below.
 
-#### Get Params and _fields_
+#### Parameters
 
-* The model `params` must be sent as body at the invoked function. For more information see [@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/model).
-* The `fields` is an _optional_ String Array to reduce response, this is very useful to make responses smaller.
+All parameters are _optional_
 
-> :info: See the Example section for more context.
+* `fields`. _String Array_ to reduce response, this is very useful to make responses smaller.
+* `allItems`. _Boolean_ to obtain all items, using `getPaged()` method. _default_ `false`. _**Since 2.0.0**_
+* `calculateTotals`. _Boolean_ to calculate totals with `getTotals()` method. _default_ `false`. _**Since 2.0.0**_
+* `filters`, `page`, `limit`, `order`, `changeKeys`. Classic `get()` parameters. For more information see [@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/model).
+
+> ℹ️ See the Example section for more context.
+
+#### Totals
+
+To obtain the totals _object_ is required to
 
 #### Response
 
@@ -81,24 +93,24 @@ async () => {
 	/**
 	 *	response.payload: {
 		 	items: [
-				{ id: 1, referenceId: 'coke-123', name: 'Coke' },
-				{ id: 2, referenceId: 'pepsi-456', name: 'Pepsi' }
-			],
-			totals: { total: 2, page: 1 }
+				{ id: 1, referenceId: 'coke-123', name: 'Coke' }
+			]
 	 	}
 	 */
 
 	const filteredResponse = await Invoker.clientCall('GetProduct', 'my-client-code', {
 		filters: { name: 'Coke' },
-		fields: ['id', 'referenceId']
+		fields: ['id', 'referenceId'],
+		calculateTotals: true
 	});
 
 	/**
 	 *	filteredResponse.payload: {
 		 	items: [
-				{ id: 1, referenceId: 'coke-123' }
+				{ id: 1, referenceId: 'coke-123' },
+				{ id: 2, referenceId: 'pepsi-456'}
 			],
-			totals: { total: 1, page: 1 }
+			totals: { total: 2, page: 1 }
 	 	}
 	 */
 

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - **_Breaking change_**: Now `calculateTotals` is required to perform `getTotals()` query and return `totals`
+- Updated dependencies
 
 ## [1.2.0] - 2022-06-24
 ### Added
