@@ -24,7 +24,6 @@ LambdaGet is used to wrap the `get()` and `getPaged()` method from models.
 #### Configuration
 
 * The _getter_ `modelClass` should return the **Model** for our entity.
-* The _method_ **async** `format(items)` _optional_: Receives the getted items as parameter so you can format them and return the formatted items.
 * You can use `mustHaveClient` to defines if the function will be used for Client models. _default_ `true`.
 * You can use `mustHavePayload` to make **payload** mandatory or not. _default_ `false`.
 
@@ -34,12 +33,17 @@ LambdaGet is used to wrap the `get()` and `getPaged()` method from models.
 
 All parameters are _optional_
 
-* `fields`. _String Array_ to reduce response, this is very useful to make responses smaller.
+* `fields`. _String Array_ to reduce response. For more information see [@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/model).
+* `excludeFields`. _String Array_ to reduce response. *Since 2.1.0*. For more information see [@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/model).
 * `allItems`. _Boolean_ to obtain all items, using `getPaged()` method. _default_ `false`. _**Since 2.0.0**_
 * `calculateTotals`. _Boolean_ to calculate totals with `getTotals()` method. _default_ `false`. _**Since 2.0.0**_
 * `filters`, `page`, `limit`, `order`, `changeKeys`. Classic `get()` parameters. For more information see [@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/model).
+* `formatParams`. _Object_ to pass parameters to `format()` method. *Since 2.1.0*. See Formatting results below.
 
-> ℹ️ See the Example section for more context.
+#### Formatting results
+
+The optional _method_ **async** `format(items, formatParams)` allows you to format every item.
+The `formatParams` can be used give different behaviors to the function.
 
 #### Totals
 
@@ -49,7 +53,7 @@ To obtain the totals _object_ is required to
 
 The response of the lambda functions is explained in the [@janiscommerce/lambda](https://www.npmjs.com/package/@janiscommerce/lambda) package.
 
-#### Example
+#### Examples
 
 First you need to create your lambda function.
 
@@ -67,12 +71,11 @@ class GetProduct extends LambdaGet {
 		return ProductModel;
 	}
 
-	async format(items) {
-
-		return items.map(item => {
-			// do some formatting
-			return item;
-		});
+	async format(items, { countImages }) {
+		return items.map(item => ({
+			...item,
+			...countImages && { imagesCount: item?.images.length || 0 }
+		}));
 	}
 }
 
@@ -93,22 +96,25 @@ async () => {
 	/**
 	 *	response.payload: {
 		 	items: [
-				{ id: 1, referenceId: 'coke-123', name: 'Coke' }
+				{ id: 1, referenceId: 'coke-2lt', name: 'Coke lts', stock: 100, images: ['coke-2lt.jpg'] },
+				{ id: 2, referenceId: 'pepsi-2lt', name: 'Pepsi 2lts', stock: 100 },
+				{ id: 3, referenceId: 'fanta-2lt', name: 'Fanta 2lts', stock: 95 }
 			]
 	 	}
 	 */
 
 	const filteredResponse = await Invoker.clientCall('GetProduct', 'my-client-code', {
-		filters: { name: 'Coke' },
-		fields: ['id', 'referenceId'],
-		calculateTotals: true
+		filters: { stock: 100 },
+		fields: ['referenceId', 'images'],
+		calculateTotals: true,
+		formatParams: { countImages: true }
 	});
 
 	/**
 	 *	filteredResponse.payload: {
 		 	items: [
-				{ id: 1, referenceId: 'coke-123' },
-				{ id: 2, referenceId: 'pepsi-456'}
+				{ id: 1, referenceId: 'coke-2lt', images: ['coke-2lt.jpg'], imagesCount: 1 },
+				{ id: 2, referenceId: 'pepsi-2lt', imagesCount: 0 }
 			],
 			totals: { total: 2, page: 1 }
 	 	}

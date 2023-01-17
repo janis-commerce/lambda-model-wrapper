@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.1.0] - 2023-01-17
+### Added
+- New parameter `excludeFields` for model to exclude fields
+- New parameter `formatParams` to be passed to `format()` method
+
+### Changed
+- Now parameter `fields` is passed to model to select specific fields
+
 ## [2.0.0] - 2022-06-24
 ### Added
 - `getPaged()` method using parameter `allItems`

@@ -41,8 +41,11 @@ describe('LambdaGet', () => {
 
 	class GetWrapperWithFormat extends ValidGetWrapper {
 
-		async format(items) {
-			return items.map((item, index) => ({ ...item, extraField: index + 1 }));
+		async format(items, { addIndex } = {}) {
+			return items.map((item, index) => ({
+				...item,
+				...addIndex && { index }
+			}));
 		}
 	}
 
@@ -86,7 +89,7 @@ describe('LambdaGet', () => {
 		const response = await Handler.handle(ValidGetWrapper, {
 			...event,
 			body: {
-				fields: ['id', 'referenceId'],
+				fields: ['id', 'referenceId', 'name'],
 				calculateTotals: true
 			}
 		});
@@ -94,15 +97,17 @@ describe('LambdaGet', () => {
 		assert.deepEqual(response, {
 			items: [{
 				id: '62685f1900b3e56803b9cf8c',
-				referenceId: 'coke-1lt'
+				referenceId: 'coke-1lt',
+				name: 'Coke 1lt'
 			}, {
 				id: '62685f4d659ebb59d22893d7',
-				referenceId: 'coke-2lt'
+				referenceId: 'coke-2lt',
+				name: 'Coke 2lt'
 			}],
 			totals: { total: 2 }
 		});
 
-		sinon.assert.calledOnceWithExactly(Model.prototype.get, {});
+		sinon.assert.calledOnceWithExactly(Model.prototype.get, { fields: ['id', 'referenceId', 'name'] });
 	});
 
 	it('Should get skus and response the items and totals using full params', async () => {
@@ -187,48 +192,9 @@ describe('LambdaGet', () => {
 		});
 	});
 
-	it('Should apply fields normalization when using changeKeys param', async () => {
+	it('Should call format method when Lambda has the method defined', async () => {
 
-		stubGet({
-			'coke-1lt': {
-				id: '62685f1900b3e56803b9cf8c',
-				referenceId: 'coke-1lt',
-				name: 'Coke 1lt'
-			}
-		});
-
-		const response = await Handler.handle(ValidGetWrapper, {
-			...event,
-			body: {
-				filters: { referenceId: 'coke-1lt' },
-				page: 1,
-				limit: 1,
-				order: { name: 'asc' },
-				changeKeys: 'referenceId',
-				fields: ['name']
-			}
-		});
-
-		assert.deepEqual(response, {
-			items: {
-				'coke-1lt': { name: 'Coke 1lt' }
-			}
-		});
-
-		sinon.assert.calledOnceWithExactly(Model.prototype.get, {
-			filters: { referenceId: 'coke-1lt' },
-			page: 1,
-			limit: 1,
-			order: { name: 'asc' },
-			changeKeys: 'referenceId'
-		});
-
-		sinon.assert.notCalled(Model.prototype.getTotals);
-	});
-
-	it('Should format items when format method is available', async () => {
-
-		stubGet([{
+		const items = [{
 			id: '62685f1900b3e56803b9cf8c',
 			referenceId: 'coke-1lt',
 			name: 'Coke 1lt'
@@ -236,26 +202,57 @@ describe('LambdaGet', () => {
 			id: '62685f4d659ebb59d22893d7',
 			referenceId: 'coke-2lt',
 			name: 'Coke 2lt'
-		}]);
+		}];
+
+		stubGet(items);
+
+		sinon.spy(GetWrapperWithFormat.prototype, 'format');
 
 		const response = await Handler.handle(GetWrapperWithFormat, { ...event });
 
+		assert.deepEqual(response, { items });
+
+		sinon.assert.calledOnceWithExactly(Model.prototype.get, {});
+		sinon.assert.notCalled(Model.prototype.getTotals);
+
+		sinon.assert.calledOnceWithExactly(GetWrapperWithFormat.prototype.format, items, {});
+	});
+
+	it('Should format items passing formatParams when format method is available', async () => {
+
+		const items = [{
+			id: '62685f1900b3e56803b9cf8c',
+			referenceId: 'coke-1lt',
+			name: 'Coke 1lt'
+		}, {
+			id: '62685f4d659ebb59d22893d7',
+			referenceId: 'coke-2lt',
+			name: 'Coke 2lt'
+		}];
+
+		stubGet(items);
+
+		sinon.spy(GetWrapperWithFormat.prototype, 'format');
+
+		const response = await Handler.handle(GetWrapperWithFormat, {
+			...event,
+			body: { formatParams: { addIndex: true } }
+		});
+
 		assert.deepEqual(response, {
 			items: [{
-				id: '62685f1900b3e56803b9cf8c',
-				referenceId: 'coke-1lt',
-				name: 'Coke 1lt',
-				extraField: 1
+				...items[0],
+				index: 0
 			}, {
-				id: '62685f4d659ebb59d22893d7',
-				referenceId: 'coke-2lt',
-				name: 'Coke 2lt',
-				extraField: 2
+				...items[1],
+				index: 1
 			}]
 		});
 
 		sinon.assert.calledOnceWithExactly(Model.prototype.get, {});
 		sinon.assert.notCalled(Model.prototype.getTotals);
+
+		sinon.assert.calledOnceWithExactly(GetWrapperWithFormat.prototype.format, items, { addIndex: true });
 	});
 
 	it('Should use getPaged method when received allItems parameter', async () => {
@@ -274,7 +271,7 @@ describe('LambdaGet', () => {
 				name: 'Coke 2lt'
 			}]);
 
-		const response = await Handler.handle(GetWrapperWithFormat, {
+		const response = await Handler.handle(ValidGetWrapper, {
 			...event,
 			body: {
 				limit: 1,
@@ -286,13 +283,11 @@ describe('LambdaGet', () => {
 			items: [{
 				id: '62685f1900b3e56803b9cf8c',
 				referenceId: 'coke-1lt',
-				name: 'Coke 1lt',
-				extraField: 1
+				name: 'Coke 1lt'
 			}, {
 				id: '62685f4d659ebb59d22893d7',
 				referenceId: 'coke-2lt',
-				name: 'Coke 2lt',
-				extraField: 2
+				name: 'Coke 2lt'
 			}]
 		});
 

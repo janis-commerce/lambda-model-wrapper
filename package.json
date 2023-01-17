@@ -20,7 +20,7 @@
   "homepage": "https://github.com/janis-commerce/lambda-model-wrapper.git#readme",
   "devDependencies": {
     "@janiscommerce/api-session": "^3.3.1",
-    "@janiscommerce/model": "^6.6.3",
+    "@janiscommerce/model": "^6.8.2",
     "eslint": "^8.24.0",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.25.3",
@@ -38,8 +38,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "@janiscommerce/lambda": "^4.0.0",
-    "@janiscommerce/superstruct": "^1.2.1",
-    "objects-normalizer": "^1.0.4"
+    "@janiscommerce/lambda": "^4.1.1",
+    "@janiscommerce/superstruct": "^1.2.1"
   }
 }
