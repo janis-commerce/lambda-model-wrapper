@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [3.0.0] - 2023-04-20
+### Changed
+- Update [@janiscommerce/@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/@janiscommerce/model) to version 7xx
+- Update [@janiscommerce/@janiscommerce/lambda](https://www.npmjs.com/package/@janiscommerce/@janiscommerce/lambda) to version 6xx
+
 ## [2.1.0] - 2023-01-17
 ### Added
 - New parameter `excludeFields` for model to exclude fields
