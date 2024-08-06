@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [4.0.0] - 2024-08-06
+### Added
+- New parameter `onlyTotals` to avoid `get()` command when only totals needed
+
+### Changed
+- Update [@janiscommerce/@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/@janiscommerce/model) to version 8xx
+
 ## [3.0.0] - 2023-04-20
 ### Changed
 - Update [@janiscommerce/@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/@janiscommerce/model) to version 7xx

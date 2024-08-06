@@ -257,19 +257,19 @@ describe('LambdaGet', () => {
 
 	it('Should use getPaged method when received allItems parameter', async () => {
 
-		sinon.stub(Model.prototype, 'get')
-			.onCall(0)
-			.resolves([{
-				id: '62685f1900b3e56803b9cf8c',
-				referenceId: 'coke-1lt',
-				name: 'Coke 1lt'
-			}])
-			.onCall(1)
-			.resolves([{
-				id: '62685f4d659ebb59d22893d7',
-				referenceId: 'coke-2lt',
-				name: 'Coke 2lt'
-			}]);
+		sinon.stub(Model.prototype, 'getPaged')
+			.callsFake((params, callback) => {
+				callback.call(null, [{
+					id: '62685f1900b3e56803b9cf8c',
+					referenceId: 'coke-1lt',
+					name: 'Coke 1lt'
+				}]);
+				callback.call(null, [{
+					id: '62685f4d659ebb59d22893d7',
+					referenceId: 'coke-2lt',
+					name: 'Coke 2lt'
+				}]);
+			});
 
 		const response = await Handler.handle(ValidGetWrapper, {
 			...event,
@@ -291,10 +291,29 @@ describe('LambdaGet', () => {
 			}]
 		});
 
-		sinon.assert.calledWithExactly(Model.prototype.get, { page: 1, limit: 1 });
-		sinon.assert.calledWithExactly(Model.prototype.get, { page: 2, limit: 1 });
-		sinon.assert.calledWithExactly(Model.prototype.get, { page: 3, limit: 1 });
-		sinon.assert.calledThrice(Model.prototype.get);
+		sinon.assert.calledOnceWithExactly(
+			Model.prototype.getPaged,
+			{ limit: 1 },
+			sinon.match.func
+		);
 	});
 
+	it('Should only get totals when onlyTotals params received', async () => {
+
+		stubGet([], { total: 300 });
+
+		const response = await Handler.handle(ValidGetWrapper, {
+			...event,
+			body: {
+				filters: { status: 'active' },
+				onlyTotals: true
+			}
+		});
+
+		assert.deepEqual(response, { totals: { total: 300 } });
+
+		sinon.assert.notCalled(Model.prototype.get);
+		sinon.assert.calledOnceWithExactly(Model.prototype.getTotals, { status: 'active' });
+
+	});
 });

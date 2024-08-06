@@ -17,10 +17,6 @@ npm install @janiscommerce/lambda-model-wrapper
 
 LambdaGet is used to wrap the `get()` and `getPaged()` method from models.
 
-#### Breaking changes _Since 2.0.0_ ⚠️
-
-* In `1.x.x` the `totals` were always calculated. Now you need to need to send the `calculateTotals` parameter with **true** value.
-
 #### Configuration
 
 * The _getter_ `modelClass` should return the **Model** for our entity.
@@ -39,6 +35,7 @@ All parameters are _optional_
 * `calculateTotals`. _Boolean_ to calculate totals with `getTotals()` method. _default_ `false`. _**Since 2.0.0**_
 * `filters`, `page`, `limit`, `order`, `changeKeys`. Classic `get()` parameters. For more information see [@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/model).
 * `formatParams`. _Object_ to pass parameters to `format()` method. *Since 2.1.0*. See Formatting results below.
+* `onlyTotals`. _Boolean_ to only calculate totals with optional `filters`. *Since 4.0.0*.
 
 #### Formatting results
 
