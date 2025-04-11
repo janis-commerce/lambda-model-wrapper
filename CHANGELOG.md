@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [4.1.0] - 2025-04-11
+### Added
+- New `LambdaGroupAggregate` class: a reusable Lambda wrapper that performs MongoDB `group` aggregations by `field`.
+
 ## [4.0.0] - 2024-08-06
 ### Added
 - New parameter `onlyTotals` to avoid `get()` command when only totals needed

@@ -120,3 +120,106 @@ async () => {
 };
 
 ```
+
+### 🧮 LambdaGroupAggregate
+The **LambdaGroupAggregate** wrapper allows you to easily create a Lambda that performs a MongoDB `aggregate()` with a simple $group by a specific field.
+
+This wrapper is designed for **one Lambda per service**, and supports grouping for multiple entities using a common pattern.
+
+#### ✅ When to use
+Use **LambdaGroupAggregate** if you want to expose a Lambda that groups documents by a specific field and returns a count for each group.
+
+#### 📦 Usage
+Extend the **LambdaGroupAggregate** class and define the entities getter with the available entities for this service.
+
+Each entity must be mapped to its corresponding model class.
+
+```javascript
+'use strict';
+
+const { LambdaGroupAggregate } = require('@janiscommerce/lambda-model-wrapper');
+
+const Product = require('./models/product');
+const Brand = require('./models/brand');
+const ProductImage = require('./models/product-image');
+
+module.exports = class GroupByLambda extends LambdaGroupAggregate {
+
+	get entities() {
+		return {
+			product: Product,
+			brand: Brand,
+			'product-image': ProductImage
+		};
+	}
+};
+
+```
+
+#### 📤 Expected Input
+The request body should include the following:
+
+```json
+{
+	"entity": "product",
+	"field": "status"
+}
+```
+
+* `entity`: The key defined in the `entities` getter (e.g. `'product'`)
+* `field`: The field in the model to group by (e.g. `'status'`)
+
+#### 📥 Response
+
+The Lambda will respond with an object containing the group values and the corresponding counts:
+
+```json
+{
+	"active": 450,
+	"inactive": 20,
+	"error": 1
+}
+```
+
+#### 🧪 Example Aggregation
+
+Internally, the Lambda will run a simple `$group` aggregation on the selected model:
+
+```javascript
+await model.aggregate([
+	$group: {
+		_id: `$${field}`,
+		count: { $sum: 1 }
+	}
+]);
+```
+
+#### 📡 How to invoke
+To call a Lambda using **LambdaGroupAggregate**, use the `@janiscommerce/lambda` package from another service.
+
+```javascript
+'use strict';
+
+const { Invoker } = require('@janiscommerce/lambda');
+
+const result = await Invoker.clientCall('your-service-name', 'your-lambda-name', {
+	entity: 'product',
+	field: 'status'
+});
+
+```
+
+#### ✅ Result
+
+The result will be an object mapping the grouped field values to their count:
+
+```javascript
+{
+	active: 450,
+	inactive: 20,
+	error: 1
+}
+```
+
+* If the entity or field is missing or invalid, the Lambda will respond with a `400` error.
+* If the model returns no data, an empty object will be returned.

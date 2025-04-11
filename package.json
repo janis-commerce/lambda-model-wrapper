@@ -5,11 +5,12 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "export TEST_ENV=true; mocha --exit -R nyan --recursive tests/",
-    "test-ci": "nyc --reporter=lcov --reporter=text-summary mocha --exit --recursive tests/",
+    "coverage-ci": "nyc --reporter=lcov --reporter=text-summary mocha --exit --recursive tests/",
     "watch-test": "export TEST_ENV=true; mocha --exit -R nyan -w --recursive tests/",
     "coverage": "nyc npm test",
     "lint": "eslint lib/ tests/",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "postpublish": "./.postpublish.sh"
   },
   "repository": {
     "type": "git",
@@ -20,14 +21,14 @@
   "homepage": "https://github.com/janis-commerce/lambda-model-wrapper.git#readme",
   "devDependencies": {
     "@janiscommerce/api-session": "^3.4.0",
-    "@janiscommerce/model": "^8.7.0",
+    "@janiscommerce/model": "^8.8.2",
     "eslint": "^8.24.0",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.25.3",
     "husky": "^8.0.3",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "sinon": "^15.0.4"
+    "sinon": "^17.0.1"
   },
   "files": [
     "lib/",
@@ -38,7 +39,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "@janiscommerce/lambda": "^6.0.2",
-    "@janiscommerce/superstruct": "^1.2.1"
+    "@janiscommerce/lambda": "^6.2.3",
+    "@janiscommerce/superstruct": "^1.2.2"
   }
 }
