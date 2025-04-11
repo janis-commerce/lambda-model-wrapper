@@ -85,7 +85,7 @@ describe('LambdaGroupAggregate', () => {
 				_id: 'active',
 				count: 2435987
 			}, {
-				_id: 'inactive',
+				id: 'inactive',
 				count: 231
 			}]);
 

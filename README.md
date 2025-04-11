@@ -137,22 +137,25 @@ Each entity must be mapped to its corresponding model class.
 ```javascript
 'use strict';
 
+const { Handler } = require('@janiscommerce/lambda');
 const { LambdaGroupAggregate } = require('@janiscommerce/lambda-model-wrapper');
 
-const Product = require('./models/product');
-const Brand = require('./models/brand');
-const ProductImage = require('./models/product-image');
+const ProductModel = require('./models/product');
+const ProductImageModel = require('./models/product-image');
+const BrandModel = require('./models/brand');
 
-module.exports = class GroupByLambda extends LambdaGroupAggregate {
+class GroupAggregate extends LambdaGroupAggregate {
 
 	get entities() {
 		return {
-			product: Product,
-			brand: Brand,
-			'product-image': ProductImage
+			product: ProductModel
+			'product-image': ProductImageModel,
+			brand: BrandModel
 		};
 	}
 };
+
+module.exports.handler = (...args) => Handler.handle(GroupAggregate, ...args);
 
 ```
 
