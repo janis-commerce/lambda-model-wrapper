@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [4.1.2] - 2025-04-14
+### Fixed
+- `LambdaGroupAggregate` added `allowDiskUse` and `hint` options
+
 ## [4.1.1] - 2025-04-11
 ### Fixed
 - `LambdaGroupAggregate` handles responses with `_id` and `id`

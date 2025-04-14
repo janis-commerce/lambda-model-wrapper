@@ -21,7 +21,7 @@
   "homepage": "https://github.com/janis-commerce/lambda-model-wrapper.git#readme",
   "devDependencies": {
     "@janiscommerce/api-session": "^3.4.0",
-    "@janiscommerce/model": "^8.8.2",
+    "@janiscommerce/model": "^8.8.3",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
@@ -41,5 +41,8 @@
   "dependencies": {
     "@janiscommerce/lambda": "^6.2.3",
     "@janiscommerce/superstruct": "^1.2.2"
+  },
+  "peerDependencies": {
+    "@janiscommerce/model": "^8.8.3"
   }
 }
