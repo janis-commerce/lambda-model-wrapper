@@ -184,6 +184,18 @@ The Lambda will respond with an object containing the group values and the corre
 }
 ```
 
+#### ⚠️ Field Index Requirement
+
+**Important: The field provided in the request body must have an index defined in the corresponding MongoDB collection.**
+
+Internally, the aggregation uses a `hint` to force index usage:
+
+If the specified field is not indexed with `{ [field]: 1 }`, the lambda will fail with an error like:
+
+> MongoServerError: hint provided does not correspond to an existing index
+
+✅ Make sure to create the appropriate index in your model or migration before using this lambda.
+
 #### 🧪 Example Aggregation
 
 Internally, the Lambda will run a simple `$group` aggregation on the selected model:
@@ -193,8 +205,11 @@ await model.aggregate([
 	$group: {
 		_id: `$${field}`,
 		count: { $sum: 1 }
-	}
-]);
+	},
+], {
+	allowDiskUse: true,
+	hint: { [${field}]: 1 }
+});
 ```
 
 #### 📡 How to invoke

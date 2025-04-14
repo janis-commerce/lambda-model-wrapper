@@ -75,7 +75,8 @@ describe('LambdaGroupAggregate', () => {
 		afterEach(() => {
 			sinon.assert.calledOnceWithExactly(
 				Model.prototype.aggregate,
-				[{ $group: { _id: '$status', count: { $sum: 1 } } }]
+				[{ $group: { _id: '$status', count: { $sum: 1 } } }],
+				{ allowDiskUse: true, hint: { status: 1 } }
 			);
 		});
 
