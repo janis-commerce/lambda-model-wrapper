@@ -74,6 +74,21 @@ describe('LambdaGet', () => {
 		sinon.assert.calledOnceWithExactly(Model.prototype.get, {});
 	});
 
+	it('Should allow receive unknown parameters without reject (partial data validation)', async () => {
+
+		stubGet([]);
+
+		const response = await Handler.handle(ValidGetWrapper, {
+			...event,
+			body: { unknown: 'unknown' }
+		});
+
+		assert.deepEqual(response, { items: [] });
+
+		sinon.assert.calledOnceWithExactly(Model.prototype.get, {});
+		sinon.assert.notCalled(Model.prototype.getTotals);
+	});
+
 	it('Should get skus and response the items and totals with fields reducing result', async () => {
 
 		stubGet([{
