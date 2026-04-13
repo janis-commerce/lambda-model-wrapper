@@ -72,14 +72,6 @@ describe('LambdaGroupAggregate', () => {
 
 	context('When valid lambda and data received', () => {
 
-		afterEach(() => {
-			sinon.assert.calledOnceWithExactly(
-				Model.prototype.aggregate,
-				[{ $group: { _id: '$status', count: { $sum: 1 } } }],
-				{ allowDiskUse: true, hint: { status: 1 } }
-			);
-		});
-
 		it('Should use model to count by field using aggregate', async () => {
 
 			stubAggregate([{
@@ -96,6 +88,12 @@ describe('LambdaGroupAggregate', () => {
 				active: 2435987,
 				inactive: 231
 			});
+
+			sinon.assert.calledOnceWithExactly(
+				Model.prototype.aggregate,
+				[{ $group: { _id: '$status', count: { $sum: 1 } } }],
+				{ allowDiskUse: true, hint: { status: 1 }, readPreference: 'secondaryPreferred' }
+			);
 		});
 
 		it('Should response empty object when no data found', async () => {
@@ -105,6 +103,32 @@ describe('LambdaGroupAggregate', () => {
 			const response = await Handler.handle(ValidWrapper, validEvent);
 
 			assert.deepEqual(response, {});
+
+			sinon.assert.calledOnceWithExactly(
+				Model.prototype.aggregate,
+				[{ $group: { _id: '$status', count: { $sum: 1 } } }],
+				{ allowDiskUse: true, hint: { status: 1 }, readPreference: 'secondaryPreferred' }
+			);
+		});
+
+		it('Should pass the readPreference option to the aggregate method', async () => {
+
+			stubAggregate([{
+				_id: 'active',
+				count: 2435987
+			}]);
+
+			const response = await Handler.handle(ValidWrapper, { ...validEvent, body: { ...validEvent.body, readPreference: 'primary' } });
+
+			assert.deepEqual(response, {
+				active: 2435987
+			});
+
+			sinon.assert.calledOnceWithExactly(
+				Model.prototype.aggregate,
+				[{ $group: { _id: '$status', count: { $sum: 1 } } }],
+				{ allowDiskUse: true, hint: { status: 1 }, readPreference: 'primary' }
+			);
 		});
 	});
 });

@@ -318,4 +318,16 @@ describe('LambdaGet', () => {
 		sinon.assert.calledOnceWithExactly(Model.prototype.getTotals, { status: 'active' });
 
 	});
+
+	it('Should pass the readPreference option to the get method', async () => {
+
+		stubGet([]);
+
+		const response = await Handler.handle(ValidGetWrapper, { ...event, body: { ...event.body, readPreference: 'secondaryPreferred' } });
+
+		assert.deepEqual(response, { items: [] });
+
+		sinon.assert.calledOnceWithExactly(Model.prototype.get, { readPreference: 'secondaryPreferred' });
+		sinon.assert.notCalled(Model.prototype.getTotals);
+	});
 });

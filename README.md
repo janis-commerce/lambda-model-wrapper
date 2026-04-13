@@ -36,6 +36,7 @@ All parameters are _optional_
 * `filters`, `page`, `limit`, `order`, `changeKeys`. Classic `get()` parameters. For more information see [@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/model).
 * `formatParams`. _Object_ to pass parameters to `format()` method. *Since 2.1.0*. See Formatting results below.
 * `onlyTotals`. _Boolean_ to only calculate totals with optional `filters`. *Since 4.0.0*.
+* `readPreference`. _String_ to set the read preference for the query. Valid values: `'primary'`, `'primaryPreferred'`, `'secondary'`, `'secondaryPreferred'`, `'nearest'`. *Since 4.2.0*.
 
 #### Formatting results
 
@@ -171,6 +172,7 @@ The request body should include the following:
 
 * `entity`: The key defined in the `entities` getter (e.g. `'product'`)
 * `field`: The field in the model to group by (e.g. `'status'`)
+* `readPreference`. _String_ to optionally set the read preference for the query. Valid values: `'primary'`, `'primaryPreferred'`, `'secondary'`, `'secondaryPreferred'`, `'nearest'`. *Since 4.2.0*. Default: `'secondaryPreferred'`.
 
 #### 📥 Response
 
