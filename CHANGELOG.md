@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-04-13
+### Added
+- `LambdaGet` and `LambdaGroupAggregate` wrappers now accept a new parameter `readPreference` to set the read preference for the query
+
 ## [4.1.2] - 2025-04-14
 ### Fixed
 - `LambdaGroupAggregate` added `allowDiskUse` and `hint` options
